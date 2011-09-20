@@ -88,6 +88,7 @@ signals:
     void initialized();
     void loadStarted();
     void loadFinished(const QString &status);
+    void firstRender();
     void javaScriptAlertSent(const QString &msg);
     void javaScriptConsoleMessageSent(const QString &message, int lineNumber, const QString &source);
     void resourceRequested(const QVariant &req);

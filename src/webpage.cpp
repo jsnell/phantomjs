@@ -113,6 +113,8 @@ WebPage::WebPage(QObject *parent, const Config *config)
     connect(m_webPage, SIGNAL(loadStarted()), SIGNAL(loadStarted()));
     connect(m_webPage, SIGNAL(loadFinished(bool)), SLOT(finish(bool)));
 
+    connect(m_mainFrame, SIGNAL(initialLayoutCompleted()), SIGNAL(firstRender()));
+
     // Start with transparent background.
     QPalette palette = m_webPage->palette();
     palette.setBrush(QPalette::Base, Qt::transparent);
