@@ -35,6 +35,8 @@
 #include <QNetworkReply>
 #include <QNetworkRequest>
 
+#include <cstdio>
+
 #include "config.h"
 #include "cookiejar.h"
 #include "networkaccessmanager.h"
@@ -72,6 +74,7 @@ NetworkAccessManager::NetworkAccessManager(QObject *parent, const Config *config
     , m_ignoreSslErrors(config->ignoreSslErrors())
     , m_idCounter(0)
     , m_networkDiskCache(0)
+    , m_bytesReceivedForClosed(0)
 {
     if (!config->cookiesFile().isEmpty()) {
         setCookieJar(new CookieJar(config->cookiesFile()));
@@ -127,6 +130,8 @@ QNetworkReply *NetworkAccessManager::createRequest(Operation op, const QNetworkR
     data["time"] = QDateTime::currentDateTime();
 
     connect(reply, SIGNAL(readyRead()), this, SLOT(handleStarted()));
+    connect(reply, SIGNAL(downloadProgress(qint64, qint64)), this,
+            SLOT(downloadProgress(qint64, qint64)));
 
     emit resourceRequested(data);
     return new NetworkReplyProxy(this, reply);
@@ -192,6 +197,9 @@ void NetworkAccessManager::handleFinished(QNetworkReply *reply)
     m_ids.remove(reply);
     m_started.remove(reply);
 
+    m_bytesReceivedForClosed += m_bytesReceived[reply];
+    m_bytesReceived.remove(reply);
+
     emit resourceReceived(data);
 }
 
@@ -200,4 +208,19 @@ void NetworkAccessManager::provideAuthentication(QNetworkReply *reply, QAuthenti
     Q_UNUSED(reply);
     authenticator->setUser(m_userName);
     authenticator->setPassword(m_password);
+}
+
+void NetworkAccessManager::downloadProgress(qint64 received,
+                                            qint64 total) {
+    (void) total;
+    m_bytesReceived[sender()] = received;
+    qint64 sum = m_bytesReceivedForClosed;
+  
+    QHashIterator<QObject*, qint64> i(m_bytesReceived);
+    while (i.hasNext()) {
+        i.next();
+        sum += i.value();
+    }
+  
+    emit bytesReceived(sum);
 }

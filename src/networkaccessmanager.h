@@ -57,17 +57,22 @@ protected:
 signals:
     void resourceRequested(const QVariant& data);
     void resourceReceived(const QVariant& data);
+    void bytesReceived(qint64 bytesReceived);
 
 private slots:
     void handleStarted();
     void handleFinished(QNetworkReply *reply);
     void provideAuthentication(QNetworkReply *reply, QAuthenticator *authenticator);
 
+    void downloadProgress(qint64 bytesReceived, qint64 bytesTotal);
+
 private:
     QHash<QNetworkReply*, int> m_ids;
     QSet<QNetworkReply*> m_started;
     int m_idCounter;
     QNetworkDiskCache* m_networkDiskCache;
+    QHash<QObject*, qint64> m_bytesReceived;
+    qint64 m_bytesReceivedForClosed;
 };
 
 #endif // NETWORKACCESSMANAGER_H

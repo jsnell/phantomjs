@@ -93,6 +93,7 @@ signals:
     void javaScriptConsoleMessageSent(const QString &message, int lineNumber, const QString &source);
     void resourceRequested(const QVariant &req);
     void resourceReceived(const QVariant &resource);
+    void bytesReceived(qint64 bytesReceived);
 
 private slots:
     void finish(bool ok);
