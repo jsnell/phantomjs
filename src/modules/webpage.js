@@ -113,6 +113,8 @@ exports.create = function (opts) {
 
     defineSetter("onFirstRender", "firstRender");
 
+    defineSetter("onFirstRequest", "firstRequest");
+
     defineSetter("onLoadFinished", "loadFinished");
 
     defineSetter("onResourceRequested", "resourceRequested");

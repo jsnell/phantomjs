@@ -83,12 +83,14 @@ public slots:
     void _appendScriptElement(const QString &scriptUrl);
     void uploadFile(const QString &selector, const QString &fileName);
     void sendEvent(const QString &type, const QVariant &arg1 = QVariant(), const QVariant &arg2 = QVariant());
+    void requestResource();
 
 signals:
     void initialized();
     void loadStarted();
     void loadFinished(const QString &status);
     void firstRender();
+    void firstRequest();
     void javaScriptAlertSent(const QString &msg);
     void javaScriptConsoleMessageSent(const QString &message, int lineNumber, const QString &source);
     void resourceRequested(const QVariant &req);
@@ -106,6 +108,7 @@ private:
     QPoint m_scrollPosition;
     QVariantMap m_paperSize; // For PDF output via render()
     QString m_libraryPath;
+    bool m_firstRequestSignaled;
 
     QImage renderImage();
     bool renderPdf(const QString &fileName);

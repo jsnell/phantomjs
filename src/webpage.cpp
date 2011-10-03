@@ -108,6 +108,7 @@ WebPage::WebPage(QObject *parent, const Config *config)
     setObjectName("WebPage");
     m_webPage = new CustomPage(this);
     m_mainFrame = m_webPage->mainFrame();
+    m_firstRequestSignaled = false;
 
     connect(m_mainFrame, SIGNAL(javaScriptWindowObjectCleared()), SIGNAL(initialized()));
     connect(m_webPage, SIGNAL(loadStarted()), SIGNAL(loadStarted()));
@@ -144,6 +145,8 @@ WebPage::WebPage(QObject *parent, const Config *config)
     m_webPage->setNetworkAccessManager(m_networkAccessManager);
     connect(m_networkAccessManager, SIGNAL(resourceRequested(QVariant)),
             SIGNAL(resourceRequested(QVariant)));
+    connect(m_networkAccessManager, SIGNAL(resourceRequested(QVariant)),
+            SLOT(requestResource()));
     connect(m_networkAccessManager, SIGNAL(resourceReceived(QVariant)),
             SIGNAL(resourceReceived(QVariant)));
     connect(m_networkAccessManager, SIGNAL(bytesReceived(qint64)),
@@ -562,6 +565,13 @@ void WebPage::sendEvent(const QString &type, const QVariant &arg1, const QVarian
         sendEvent("mousedown", arg1, arg2);
         sendEvent("mouseup", arg1, arg2);
         return;
+    }
+}
+
+void WebPage::requestResource() {
+    if (!m_firstRequestSignaled) {
+        emit firstRequest();
+        m_firstRequestSignaled = true;
     }
 }
 
